@@ -1,0 +1,95 @@
+Assignment 8: Sample Queries and Expected Results
+
+RUNNING THE PROGRAM
+Open Prolog in the extracted Assignment_8 directory and enter:
+?- [family_tree].
+true.
+
+Alternatively, with SWI-Prolog on your PATH:
+swipl -s family_tree.pl
+
+Enter each query at the ?- prompt, including the final period.
+Do not type the ?- prompt itself. Press ; for another solution.
+The results below are logical answers; spacing and final punctuation
+can differ between Prolog interpreters. once/1 requests one proof.
+
+1. Basic facts
+?- male(john).
+true.
+?- female(mary).
+true.
+?- parent(john, mary).
+true.
+
+2. Children through pattern matching
+?- parent(mary, Child).
+Child = alice ;
+Child = james ;
+false.
+
+3. Children as a list
+?- children_of(mary, Children).
+Children = [alice, james].
+
+4. Inverse child relationship
+?- once(child(alice, mary)).
+true.
+
+5. Grandparent through recursion at depth two
+?- once(grandparent(john, alice)).
+true.
+?- setof(G, grandparent(G, alice), Grandparents).
+Grandparents = [john, susan].
+?- setof(C, grandparent(john, C), Grandchildren).
+Grandchildren = [alice, emma, james, michael].
+
+6. Great-grandchildren are not grandchildren
+?- grandparent(john, olivia).
+false.
+?- once(ancestor_at_depth(john, olivia, 3)).
+true.
+
+7. Siblings
+?- siblings_of(alice, Siblings).
+Siblings = [james].
+?- once(sibling(mary, robert)).
+true.
+?- sibling(alice, alice).
+false.
+
+8. First cousins
+?- once(cousin(alice, emma)).
+true.
+?- setof(C, cousin(alice, C), Cousins).
+Cousins = [emma, michael].
+?- cousin(alice, james).
+false.
+
+9. Recursive descendants across multiple generations
+?- descendants_of(john, Descendants).
+Descendants = [alice, emma, james, liam, mary, michael, olivia, robert].
+?- once(descendant(olivia, john)).
+true.
+?- descendant(john, john).
+false.
+
+10. A person with no recorded children
+?- children_of(olivia, Children).
+Children = [].
+?- descendants_of(olivia, Descendants).
+Descendants = [].
+
+11. Duplicate proofs and unique results
+?- findall(S, sibling(alice, S), Raw).
+Raw = [james, james].
+?- siblings_of(alice, Unique).
+Unique = [james].
+
+Alice and James share both Mary and David. Each shared parent provides
+a valid proof, so the raw query repeats James. sort/2 or setof/3 removes
+duplicate answers. setof/3 fails if there are no solutions; the list
+helpers use findall/3 followed by sort/2 so they return [] instead.
+
+The database records a fictional, incomplete family. false means that
+the relationship cannot be proved from these facts. It does not establish
+that a relationship could never exist in a larger family database.
